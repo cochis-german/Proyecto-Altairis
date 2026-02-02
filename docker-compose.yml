@@ -21,5 +21,16 @@ services:
     depends_on:
       - db
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      API_INTERNAL_BASE: "http://api:8080"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
 volumes:
   altairis_mssql:
