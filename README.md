@@ -1,4 +1,5 @@
 🏨 Backoffice Altairis 
+
 Este es el proyecto que desarrollé para la gestión de hoteles y clientes. Está armado para que funcione de una de forma automática usando Docker, conectando un frontend en Next.js, un backend en .NET y la base de datos SQL Server.
 
 🚀 Cómo hacerlo funcionar
