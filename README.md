@@ -1,31 +1,22 @@
-🏨 Altairis Backoffice | Gestión Integral
-Bienvenido al sistema de administración de Altairis. Este proyecto ha sido diseñado siguiendo principios de Clean Architecture y SOLID, garantizando un código mantenible, escalable y listo para producción.
+🏨 Backoffice Altairis 
+Este es el proyecto que desarrollé para la gestión de hoteles y clientes. Está armado para que funcione de una de forma automática usando Docker, conectando un frontend en Next.js, un backend en .NET y la base de datos SQL Server.
 
-🚀 Stack Tecnológico
-El ecosistema está totalmente contenedorizado para asegurar que funcione en cualquier entorno sin configuraciones manuales:
-
-Frontend: Next.js 15 + React + Tailwind CSS para una experiencia de usuario fluida y moderna.
-
-Backend: ASP.NET Core 8 (Web API) implementando lógica de negocio robusta.
-
-Base de Datos: SQL Server 2022 gestionado a través de contenedores.
-
-Infraestructura: Docker & Docker Compose para orquestación total.
-
-🛠️ Guía de Inicio Rápido
-Para levantar el proyecto completo, solo necesitás tener Docker instalado. Ejecutá el siguiente comando en la raíz:
+🚀 Cómo hacerlo funcionar
+Solo necesitás tener Docker abierto y correr este comando en la terminal:
 
 Bash
 docker compose up --build
-Una vez que los contenedores estén activos, podés acceder a:
 
-🌐 Aplicación Web: http://localhost:3000
+📍 Accesos una vez prendido:
+Web del Proyecto: http://localhost:3000
 
-⚙️ API Endpoints: http://localhost:8080
+API (Backend): http://localhost:8080
 
-✨ Características Destacadas
-Docker Ready: Configuración lista para desplegar en segundos.
+🛠️ Tecnologías que usé:
+Frontend: Next.js con Tailwind CSS.
 
-Persistencia Real: Los datos se mantienen seguros en el motor de SQL Server.
+Backend: .NET 8 Web API.
 
-UI/UX Limpia: Interfaz diseñada para la eficiencia administrativa.
+Base de Datos: SQL Server 2022.
+
+Contenedores: Docker & Docker Compose.
