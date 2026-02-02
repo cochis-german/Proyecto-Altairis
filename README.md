@@ -1,7 +1,3 @@
-¡Claro que sí! Vamos a darle un toque más Premium pero limpio, usando algunos emojis sutiles y separadores para que la información se vea organizada y fácil de leer para los reclutadores.
-
-Copiá y pegá este contenido directamente en el editor de GitHub:
-
 🏨 Altairis Backoffice | Gestión Integral
 Bienvenido al sistema de administración de Altairis. Este proyecto ha sido diseñado siguiendo principios de Clean Architecture y SOLID, garantizando un código mantenible, escalable y listo para producción.
 
