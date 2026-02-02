@@ -1,171 +1,153 @@
 "use client";
-import { useEffect, useState } from "react";
 
-interface InventarioItem {
-  id: number;
-  tipoHabitacionId: number;
-  tipoHabitacion: string;
-  fecha: string;
-  unidadesDisponibles: number;
+import { useState, useEffect } from "react";
+// Ruta relativa segura tras el movimiento de la carpeta types
+import { Hotel, Inventario } from "../types";
+
+// Interfaz para la matriz de datos con tipado estricto
+interface MatrizDisponibilidad {
+  [tipo: string]: {
+    [fecha: string]: number;
+  };
 }
 
-interface InventarioResponse {
-  items: InventarioItem[];
-}
+export default function InventarioPage() {
+  const [hoteles, setHoteles] = useState<Hotel[]>([]);
+  const [selectedHotel, setSelectedHotel] = useState<number | "">("");
+  const [datos, setDatos] = useState<{ items: Inventario[] } | null>(null);
+  const [loading, setLoading] = useState(false);
 
-export default function Inventario() {
-  const [hotelId, setHotelId] = useState<number>(1);
-  const [items, setItems] = useState<InventarioItem[]>([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    hotelId: 1,
-    tipoHabitacionId: 1,
-    fecha: "",
-    unidadesDisponibles: 1,
-  });
-
+  // Cargar lista de hoteles al iniciar
   useEffect(() => {
-    fetch(`/api/inventario?hotelId=${hotelId}`)
-      .then((res) => (res.ok ? res.json() : { items: [] }))
-      .then((data: InventarioResponse) => setItems(data.items || []))
-      .catch(() => setItems([]));
-  }, [hotelId]);
+    fetch("/api/hoteles")
+      .then((res) => res.json())
+      .then((data) => setHoteles(data))
+      .catch((err) => console.error("Error cargando hoteles:", err));
+  }, []);
 
-  const handleUpsert = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch("/api/inventario/upsert", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    if (res.ok) window.location.reload();
+  // Cargar inventario cuando se selecciona un hotel
+  const fetchInventario = async (hId: number) => {
+    setLoading(true);
+    try {
+      // La ruta relativa /api/ es necesaria para el proxy de Docker
+      const res = await fetch(`/api/inventario?hotelId=${hId}`);
+      const data = await res.json();
+      setDatos(data);
+    } catch (err) {
+      console.error("Error cargando inventario:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleHotelChange = (id: string) => {
+    const hotelId = id === "" ? "" : Number(id);
+    setSelectedHotel(hotelId);
+    if (hotelId !== "") {
+      fetchInventario(hotelId);
+    } else {
+      setDatos(null);
+    }
+  };
+
+  // 1. Extraer las fechas únicas (Cabeceras de columna)
+  const fechas: string[] =
+    datos?.items?.reduce((acc: string[], curr: Inventario) => {
+      const f = new Date(curr.fecha).toLocaleDateString();
+      if (!acc.includes(f)) acc.push(f);
+      return acc;
+    }, []) || [];
+
+  // 2. Agrupar datos por Tipo de Habitación (Filas)
+  const filas: MatrizDisponibilidad =
+    datos?.items?.reduce((acc: MatrizDisponibilidad, curr: Inventario) => {
+      const tipo = curr.tipoHabitacion || "Sin Categoría";
+      const fechaKey = new Date(curr.fecha).toLocaleDateString();
+
+      if (!acc[tipo]) acc[tipo] = {};
+      acc[tipo][fechaKey] = curr.unidadesDisponibles;
+      return acc;
+    }, {} as MatrizDisponibilidad) || {};
+
   return (
-    <main className="p-8 bg-stone-50 min-h-screen text-stone-800 font-sans">
-      <div className="max-w-6xl mx-auto">
-        <header className="flex justify-between items-center mb-10">
-          <h1 className="text-4xl font-serif font-bold text-stone-900">
-            Disponibilidad
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">
+            Disponibilidad Real
           </h1>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="bg-stone-900 text-white px-8 py-3 rounded-2xl font-bold shadow-lg active:scale-95 transition-all"
-          >
-            Actualizar Stock
-          </button>
-        </header>
-
-        <div className="bg-white p-4 rounded-3xl mb-10 flex gap-4 items-center shadow-sm max-w-xs border border-stone-100">
-          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest ml-4">
-            Hotel ID:
-          </span>
-          <input
-            type="number"
-            value={hotelId}
-            onChange={(e) => setHotelId(parseInt(e.target.value))}
-            className="w-20 p-2 bg-stone-50 rounded-xl text-center font-bold text-stone-900 border-none outline-none focus:ring-2 focus:ring-stone-200"
-          />
+          <p className="text-slate-500">
+            Matriz de ocupación proyectada a 14 días.
+          </p>
         </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map((i) => (
-            <div
-              key={i.id}
-              className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-stone-100 border-b-4 border-b-stone-900 transition-transform hover:-translate-y-1"
-            >
-              <p className="text-stone-400 text-[10px] font-bold uppercase mb-1">
-                {new Date(i.fecha).toLocaleDateString()}
-              </p>
-              <h3 className="font-bold text-lg text-stone-800 mb-4 leading-none">
-                {i.tipoHabitacion}
-              </h3>
-              <div className="flex justify-between items-end">
-                <span className="text-5xl font-serif font-bold text-stone-900 leading-none">
-                  {i.unidadesDisponibles}
-                </span>
-                <span className="text-[10px] text-stone-400 font-bold uppercase tracking-tighter">
-                  Libres
-                </span>
-              </div>
-            </div>
+        <select
+          className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 font-medium outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all"
+          value={selectedHotel}
+          onChange={(e) => handleHotelChange(e.target.value)}
+        >
+          <option value="">Seleccione un Hotel...</option>
+          {hoteles.map((h) => (
+            <option key={h.id} value={h.id}>
+              {h.nombre}
+            </option>
           ))}
-        </div>
+        </select>
       </div>
 
-      {modalOpen && (
-        <div className="fixed inset-0 bg-stone-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <form
-            onSubmit={handleUpsert}
-            className="bg-white p-12 rounded-[3.5rem] w-full max-w-md shadow-2xl"
-          >
-            <h2 className="text-2xl font-bold mb-6 text-stone-900">
-              Gestionar Inventario
-            </h2>
-            <div className="space-y-4">
-              <input
-                required
-                type="number"
-                placeholder="Hotel ID"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    hotelId: parseInt(e.target.value),
-                  })
-                }
-                className="w-full p-4 bg-stone-50 rounded-xl border-none outline-none"
-              />
-              <input
-                required
-                type="number"
-                placeholder="Tipo Habitación ID"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    tipoHabitacionId: parseInt(e.target.value),
-                  })
-                }
-                className="w-full p-4 bg-stone-50 rounded-xl border-none outline-none"
-              />
-              <input
-                required
-                type="date"
-                onChange={(e) =>
-                  setFormData({ ...formData, fecha: e.target.value })
-                }
-                className="w-full p-4 bg-stone-50 rounded-xl border-none outline-none"
-              />
-              <input
-                required
-                type="number"
-                placeholder="Unidades Disponibles"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    unidadesDisponibles: parseInt(e.target.value),
-                  })
-                }
-                className="w-full p-4 bg-stone-50 rounded-xl border-none outline-none"
-              />
-            </div>
-            <div className="flex gap-4 mt-10">
-              <button
-                type="button"
-                onClick={() => setModalOpen(false)}
-                className="flex-1 font-bold text-stone-400"
-              >
-                Cerrar
-              </button>
-              <button
-                type="submit"
-                className="flex-1 bg-stone-900 text-white py-4 rounded-xl font-bold shadow-lg"
-              >
-                Confirmar
-              </button>
-            </div>
-          </form>
+      {!selectedHotel ? (
+        <div className="bg-indigo-50 border border-indigo-100 p-12 rounded-3xl text-center">
+          <span className="text-4xl mb-4 block">🏢</span>
+          <p className="text-indigo-600 font-medium">
+            Seleccione un hotel para visualizar la disponibilidad.
+          </p>
+        </div>
+      ) : loading ? (
+        <div className="p-12 text-center text-slate-400 font-bold animate-pulse">
+          Sincronizando datos de inventario...
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden overflow-x-auto">
+          <table className="w-full text-center border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th className="px-6 py-4 text-left text-sm font-bold text-slate-600 sticky left-0 bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                  Categoría
+                </th>
+                {fechas.map((f) => (
+                  <th
+                    key={f}
+                    className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-l border-slate-100"
+                  >
+                    {f.split("/")[0]}/{f.split("/")[1]}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {Object.keys(filas).map((tipo) => (
+                <tr key={tipo} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-6 py-4 text-left text-sm font-bold text-slate-700 sticky left-0 bg-white border-r border-slate-100 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                    {tipo}
+                  </td>
+                  {fechas.map((f) => (
+                    <td key={f} className="px-4 py-4 border-l border-slate-50">
+                      <div
+                        className={`w-9 h-9 mx-auto flex items-center justify-center rounded-lg text-xs font-black shadow-sm transition-all ${
+                          (filas[tipo][f] || 0) > 0
+                            ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                            : "bg-rose-100 text-rose-700 border border-rose-200"
+                        }`}
+                      >
+                        {filas[tipo][f] || 0}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
-    </main>
+    </div>
   );
 }

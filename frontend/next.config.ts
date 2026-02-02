@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        // Si usas Docker Compose, cambia 'localhost' por 'backend'
-        // para que Next.js encuentre la API en la red interna de Docker.
+        // En Docker (Production) usamos el nombre del servicio: 'backend'
+        // En local usamos 127.0.0.1
         destination:
           process.env.NODE_ENV === "production"
             ? "http://backend:8080/api/:path*"
@@ -17,7 +17,8 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["localhost", "127.0.0.1"],
   },
-  reactStrictMode: false, // Recomendado para evitar dobles llamadas de carga en desarrollo
+  // Desactivado para evitar doble renderizado durante las pruebas técnicas
+  reactStrictMode: false,
 };
 
 export default nextConfig;

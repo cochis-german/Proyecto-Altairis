@@ -1,21 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Altairis Backoffice",
-  description: "Backoffice operativo de hoteles",
+  title: "Altairis | Sistema Hotelero",
+  description: "Gestión profesional de hoteles, reservas y disponibilidad",
 };
 
 export default function RootLayout({
@@ -26,41 +18,66 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+        className={`${inter.className} bg-slate-50 text-slate-900 antialiased`}
       >
-        <header className="border-b bg-white">
-          <nav className="max-w-7xl mx-auto px-6 py-3 flex gap-6 items-center">
-            <Link href="/" className="font-semibold text-gray-900">
-              Hoteles
-            </Link>
-            <Link
-              href="/clientes"
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Clientes
-            </Link>
-            <Link
-              href="/habitaciones"
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Habitaciones
-            </Link>
-            <Link
-              href="/reservas"
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Reservas
-            </Link>
-            <Link
-              href="/inventario"
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Inventario
-            </Link>
-          </nav>
-        </header>
+        {/* Barra de navegacion */}
+        <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16 items-center">
+              <div className="flex items-center gap-10">
+                <Link
+                  href="/"
+                  className="text-2xl font-black text-indigo-600 tracking-tighter"
+                >
+                  ALTAIRIS
+                </Link>
+                <div className="hidden md:flex space-x-6">
+                  <Link
+                    href="/hoteles"
+                    className="text-slate-600 hover:text-indigo-600 font-semibold transition-colors"
+                  >
+                    Hoteles
+                  </Link>
+                  <Link
+                    href="/tipos-habitacion"
+                    className="text-slate-600 hover:text-indigo-600 font-semibold transition-colors"
+                  >
+                    Habitaciones
+                  </Link>
+                  <Link
+                    href="/clientes"
+                    className="text-slate-600 hover:text-indigo-600 font-semibold transition-colors"
+                  >
+                    Clientes
+                  </Link>
+                  <Link
+                    href="/reservas"
+                    className="text-slate-600 hover:text-indigo-600 font-semibold transition-colors"
+                  >
+                    Reservas
+                  </Link>
+                  <Link
+                    href="/inventario"
+                    className="text-slate-600 hover:text-indigo-600 font-semibold transition-colors"
+                  >
+                    Disponibilidad
+                  </Link>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  Sistema Activo
+                </span>
+              </div>
+            </div>
+          </div>
+        </nav>
 
-        <main>{children}</main>
+        {/* Contenido principal */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          {children}
+        </main>
       </body>
     </html>
   );

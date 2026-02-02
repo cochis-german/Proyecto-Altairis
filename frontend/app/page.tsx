@@ -1,179 +1,83 @@
-"use client";
-import { useEffect, useState } from "react";
+import Link from "next/link";
 
-interface Hotel {
-  id: number;
-  nombre: string;
-  ciudad: string;
-  pais: string;
-  activo: boolean;
-}
-
-export default function Hoteles() {
-  const [items, setItems] = useState<Hotel[]>([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [formData, setFormData] = useState<Omit<Hotel, "id">>({
-    nombre: "",
-    ciudad: "",
-    pais: "",
-    activo: true,
-  });
-
-  useEffect(() => {
-    fetch("/api/hoteles")
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data: Hotel[]) => setItems(data))
-      .catch(() => setItems([]));
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch(
-      editingId ? `/api/hoteles/${editingId}` : "/api/hoteles",
-      {
-        method: editingId ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editingId || 0, ...formData }),
-      },
-    );
-    if (res.ok) window.location.reload();
-  };
+export default function HomePage() {
+  const menuItems = [
+    {
+      title: "Hoteles",
+      desc: "Configura sedes y ubicaciones",
+      icon: "🏢",
+      href: "/hoteles",
+      color: "bg-blue-500",
+    },
+    {
+      title: "Habitaciones",
+      desc: "Tipos, capacidades y precios",
+      icon: "🛌",
+      href: "/tipos-habitacion",
+      color: "bg-purple-500",
+    },
+    {
+      title: "Clientes",
+      desc: "Registro de huéspedes",
+      icon: "👤",
+      href: "/clientes",
+      color: "bg-indigo-500",
+    },
+    {
+      title: "Reservas",
+      desc: "Panel de control de estadías",
+      icon: "🗓️",
+      href: "/reservas",
+      color: "bg-emerald-500",
+    },
+    {
+      title: "Disponibilidad",
+      desc: "Matriz de inventario real",
+      icon: "📈",
+      href: "/inventario",
+      color: "bg-amber-500",
+    },
+  ];
 
   return (
-    <main className="p-8 bg-stone-50 min-h-screen text-stone-800">
-      <div className="max-w-6xl mx-auto">
-        <header className="flex justify-between items-center mb-16">
-          <h1 className="text-5xl font-serif font-bold tracking-tight text-stone-900">
-            Hoteles
-          </h1>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="bg-stone-900 text-white px-10 py-4 rounded-2xl font-bold shadow-xl hover:bg-stone-800 transition-all active:scale-95"
-          >
-            Añadir Sede
-          </button>
-        </header>
-
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((h) => (
-            <div
-              key={h.id}
-              className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-stone-100 group hover:shadow-2xl transition-all duration-500"
-            >
-              <div
-                className={`px-4 py-1 rounded-full text-[10px] font-bold uppercase mb-4 inline-block ${h.activo ? "bg-emerald-50 text-emerald-600" : "bg-stone-100 text-stone-400"}`}
-              >
-                {h.activo ? "Activo" : "Inactivo"}
-              </div>
-              <h2 className="text-3xl font-bold text-stone-900 mb-2 uppercase tracking-tighter leading-none">
-                {h.nombre}
-              </h2>
-              <p className="text-stone-400 font-medium mb-8">
-                {h.ciudad}, {h.pais}
-              </p>
-              <div className="flex gap-6 border-t pt-6">
-                <button
-                  onClick={() => {
-                    setEditingId(h.id);
-                    setFormData(h);
-                    setModalOpen(true);
-                  }}
-                  className="text-stone-900 font-bold underline underline-offset-4 decoration-stone-200"
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={async () => {
-                    if (confirm("¿Eliminar hotel?")) {
-                      await fetch(`/api/hoteles/${h.id}`, { method: "DELETE" });
-                      window.location.reload();
-                    }
-                  }}
-                  className="text-red-500 font-bold"
-                >
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="max-w-5xl mx-auto py-12">
+      <div className="text-center mb-16">
+        <h1 className="text-5xl font-black text-slate-900 tracking-tight mb-4">
+          Gestión Hotelera <span className="text-indigo-600">Altairis</span>
+        </h1>
+        <p className="text-xl text-slate-500 max-w-2xl mx-auto">
+          Plataforma centralizada para el control de inventario, registro de
+          huéspedes y optimización de reservas en tiempo real.
+        </p>
       </div>
 
-      {modalOpen && (
-        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white p-12 rounded-[3.5rem] w-full max-w-lg shadow-2xl"
-          >
-            <h2 className="text-3xl font-serif font-bold mb-8 text-stone-900">
-              {editingId ? "Editar" : "Nueva"} Sede
-            </h2>
-            <div className="space-y-4">
-              <input
-                required
-                placeholder="Nombre Comercial"
-                value={formData.nombre}
-                onChange={(e) =>
-                  setFormData({ ...formData, nombre: e.target.value })
-                }
-                className="w-full p-5 bg-stone-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-stone-100"
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  required
-                  placeholder="Ciudad"
-                  value={formData.ciudad}
-                  onChange={(e) =>
-                    setFormData({ ...formData, ciudad: e.target.value })
-                  }
-                  className="w-full p-5 bg-stone-50 rounded-2xl border-none outline-none"
-                />
-                <input
-                  required
-                  placeholder="País"
-                  value={formData.pais}
-                  onChange={(e) =>
-                    setFormData({ ...formData, pais: e.target.value })
-                  }
-                  className="w-full p-5 bg-stone-50 rounded-2xl border-none outline-none"
-                />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {menuItems.map((item) => (
+          <Link key={item.title} href={item.href} className="group">
+            <div className="h-full bg-white border border-slate-200 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:border-indigo-400 transition-all duration-300 transform group-hover:-translate-y-1">
+              <div
+                className={`${item.color} w-14 h-14 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-lg group-hover:scale-110 transition-transform`}
+              >
+                {item.icon}
               </div>
-              <label className="flex items-center gap-4 p-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.activo}
-                  onChange={(e) =>
-                    setFormData({ ...formData, activo: e.target.checked })
-                  }
-                  className="w-6 h-6 rounded-lg text-stone-900 focus:ring-stone-900"
-                />
-                <span className="text-xs font-bold uppercase tracking-widest text-stone-400">
-                  Estado Activo
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">
+                {item.title}
+              </h3>
+              <p className="text-slate-500 leading-relaxed">{item.desc}</p>
+              <div className="mt-6 flex items-center text-indigo-600 font-bold text-sm">
+                ACCEDER
+                <span className="ml-2 group-hover:translate-x-2 transition-transform">
+                  →
                 </span>
-              </label>
+              </div>
             </div>
-            <div className="flex gap-4 mt-10">
-              <button
-                type="button"
-                onClick={() => {
-                  setModalOpen(false);
-                  setEditingId(null);
-                }}
-                className="flex-1 font-bold text-stone-400"
-              >
-                Cerrar
-              </button>
-              <button
-                type="submit"
-                className="flex-2 bg-stone-900 text-white py-5 rounded-2xl font-bold shadow-xl"
-              >
-                Guardar
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-    </main>
+          </Link>
+        ))}
+      </div>
+
+      <footer className="mt-24 text-center text-slate-400 text-sm font-medium">
+        Altairis MVP - Technical Demo Project 2026
+      </footer>
+    </div>
   );
 }

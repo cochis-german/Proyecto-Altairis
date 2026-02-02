@@ -9,12 +9,13 @@ services:
     volumes:
       - altairis_mssql:/var/opt/mssql
 
-  api:
+  backend:
     build:
       context: ./backend/Altairis.Backoffice/Altairis.Api
       dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+      # Sincronizado con el nombre del servicio 'db'
       ConnectionStrings__Default: "Server=db,1433;Database=AltairisDb;User Id=sa;Password=Altairis12345!;Encrypt=False;TrustServerCertificate=True"
     ports:
       - "8080:8080"
@@ -26,11 +27,12 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     environment:
-      API_INTERNAL_BASE: "http://api:8080"
+      # Sincronizado con el nombre del servicio 'backend' para el proxy interno
+      API_INTERNAL_BASE: "http://backend:8080"
     ports:
       - "3000:3000"
     depends_on:
-      - api
+      - backend
 
 volumes:
   altairis_mssql:
