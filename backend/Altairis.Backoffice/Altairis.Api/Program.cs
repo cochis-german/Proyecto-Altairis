@@ -1,9 +1,20 @@
 using Altairis.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+// 1. Forzamos el puerto 8080 para que coincida con Docker y Next.js
+builder.WebHost.UseUrls("http://*:8080");
+
+// 2. Registramos controladores UNA sola vez con la configuración de CamelCase
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -17,24 +28,20 @@ builder.Services.AddCors(opt =>
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+// 3. Lógica de Migraciones Automáticas (Siempre activa para Docker)
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
     var tries = 0;
     while (true)
     {
-        try
-        {
+        try {
             db.Database.Migrate();
             break;
-        }
-        catch
-        {
+        } catch {
             tries++;
-            if (tries >= 15) throw;
-            Thread.Sleep(2000);
+            if (tries >= 20) throw; // Aumentamos reintentos por si SQL tarda en arrancar
+            Thread.Sleep(3000);
         }
     }
 }
