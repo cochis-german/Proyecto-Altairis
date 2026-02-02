@@ -1,26 +1,35 @@
-Altairis Backoffice - Gestión de Hoteles y Clientes
-Este proyecto es una solución integral para la gestión de plazas hoteleras, desarrollada bajo estándares de Clean Architecture y contenedores para garantizar una implementación rápida y estable.
+¡Claro que sí! Vamos a darle un toque más Premium pero limpio, usando algunos emojis sutiles y separadores para que la información se vea organizada y fácil de leer para los reclutadores.
 
-🚀 Tecnologías Principales
-Backend: .NET 8 utilizando WebAPI y SQL Server.
+Copiá y pegá este contenido directamente en el editor de GitHub:
 
-Frontend: Next.js con Tailwind CSS para una interfaz moderna y responsiva.
+🏨 Altairis Backoffice | Gestión Integral
+Bienvenido al sistema de administración de Altairis. Este proyecto ha sido diseñado siguiendo principios de Clean Architecture y SOLID, garantizando un código mantenible, escalable y listo para producción.
 
-Infraestructura: Docker y Docker Compose para orquestación de servicios.
+🚀 Stack Tecnológico
+El ecosistema está totalmente contenedorizado para asegurar que funcione en cualquier entorno sin configuraciones manuales:
 
-🛠️ Cómo Ejecutar el Proyecto
-Para levantar todo el entorno (Base de Datos + API + Web) de forma automática, asegúrese de tener Docker instalado y ejecute el siguiente comando en la raíz del proyecto:
+Frontend: Next.js 15 + React + Tailwind CSS para una experiencia de usuario fluida y moderna.
+
+Backend: ASP.NET Core 8 (Web API) implementando lógica de negocio robusta.
+
+Base de Datos: SQL Server 2022 gestionado a través de contenedores.
+
+Infraestructura: Docker & Docker Compose para orquestación total.
+
+🛠️ Guía de Inicio Rápido
+Para levantar el proyecto completo, solo necesitás tener Docker instalado. Ejecutá el siguiente comando en la raíz:
 
 Bash
 docker compose up --build
-Puertos de Acceso:
-Frontend: http://localhost:3000
+Una vez que los contenedores estén activos, podés acceder a:
 
-API Backend: http://localhost:8080
+🌐 Aplicación Web: http://localhost:3000
 
-📋 Funcionalidades Implementadas
-Gestión de Hoteles: CRUD completo para la administración de establecimientos.
+⚙️ API Endpoints: http://localhost:8080
 
-Gestión de Clientes: Registro y listado de usuarios del sistema.
+✨ Características Destacadas
+Docker Ready: Configuración lista para desplegar en segundos.
 
-Persistencia de Datos: Configuración automatizada de SQL Server mediante contenedores.
+Persistencia Real: Los datos se mantienen seguros en el motor de SQL Server.
+
+UI/UX Limpia: Interfaz diseñada para la eficiencia administrativa.
